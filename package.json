@@ -1,8 +1,12 @@
 {
-  "title": "html2canvas",
-  "name": "html2canvas",
+  "title": "@adenekan41/html2Canvas",
+  "name": "@adenekan41/html2Canvas",
   "description": "Screenshots with JavaScript",
   "main": "dist/html2canvas.js",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "module": "dist/html2canvas.esm.js",
   "typings": "dist/types/index.d.ts",
   "browser": "dist/html2canvas.js",
