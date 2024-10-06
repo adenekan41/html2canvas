@@ -17,7 +17,8 @@ export const transform: IPropertyValueDescriptor<Transform> = {
         if (token.type === TokenType.FUNCTION) {
             const transformFunction = SUPPORTED_TRANSFORM_FUNCTIONS[token.name];
             if (typeof transformFunction === 'undefined') {
-                throw new Error(`Attempting to parse an unsupported transform function "${token.name}"`);
+                console.warn(`Unsupported transform function "${token.name}". Using identity transform.`);
+                return [1, 0, 0, 1, 0, 0];
             }
             return transformFunction(token.values);
         }
