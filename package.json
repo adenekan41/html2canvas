@@ -1,6 +1,6 @@
 {
-  "title": "@adenekan41/html2Canvas",
-  "name": "@adenekan41/html2Canvas",
+  "title": "@codewonders/html2Canvas",
+  "name": "@codewonders/html2canvas",
   "description": "Screenshots with JavaScript",
   "main": "dist/html2canvas.js",
   "private": false,
@@ -11,16 +11,13 @@
   "typings": "dist/types/index.d.ts",
   "browser": "dist/html2canvas.js",
   "version": "1.0.0",
-  "author": {
-    "name": "Niklas von Hertzen (original author) & Adenekan Wonderful",
-    "url": "https://codewonders.dev"
-  },
+  "author": "Niklas von Hertzen (original author)",
   "engines": {
     "node": ">=8.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:adenekan41/html2canvas.git"
+    "url": "git+ssh://git@github.com/adenekan41/html2canvas.git"
   },
   "bugs": {
     "url": "https://github.com/adenekan41/html2canvas/issues"
@@ -114,5 +111,11 @@
   "license": "MIT",
   "dependencies": {
     "css-line-break": "1.1.1"
+  },
+  "homepage": "https://github.com/adenekan41/html2canvas#readme",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "tests"
   }
 }
