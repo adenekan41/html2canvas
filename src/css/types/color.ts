@@ -11,7 +11,8 @@ export const color: ITypeDescriptor<Color> = {
         if (value.type === TokenType.FUNCTION) {
             const colorFunction = SUPPORTED_COLOR_FUNCTIONS[value.name];
             if (typeof colorFunction === 'undefined') {
-                throw new Error(`Attempting to parse an unsupported color function "${value.name}"`);
+                console.warn(`>>> Unsupported color function "${value.name}". Using fallback color.`);
+                return COLORS.BLACK;
             }
             return colorFunction(value.values);
         }
@@ -101,6 +102,33 @@ const rgb = (args: CSSValue[]): number => {
     return 0;
 };
 
+const linSrgb = (x: number): number => {
+    if (x >= 0.0031308) return Math.pow(x, 1 / 2.4) * 1.055 - 0.055;
+    return x * 12.92;
+};
+
+const oklabToLinearSrgb = (L: number, a: number, b: number): [number, number, number] => {
+    const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+    const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+    const s_ = L - 0.0894841775 * a - 1.291485548 * b;
+
+    const l = l_ * l_ * l_;
+    const m = m_ * m_ * m_;
+    const s = s_ * s_ * s_;
+
+    return [
+        +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+        -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+        -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s
+    ];
+};
+
+const oklchToOklab = (L: number, C: number, h: number): [number, number, number] => {
+    const a = C * Math.cos((h * Math.PI) / 180);
+    const b = C * Math.sin((h * Math.PI) / 180);
+    return [L, a, b];
+};
+
 function hue2rgb(t1: number, t2: number, hue: number): number {
     if (hue < 0) {
         hue += 1;
@@ -148,7 +176,65 @@ const SUPPORTED_COLOR_FUNCTIONS: {
     hsl: hsl,
     hsla: hsl,
     rgb: rgb,
-    rgba: rgb
+    rgba: rgb,
+    oklab: (args: CSSValue[]): number => {
+        const tokens = args.filter(nonFunctionArgSeparator);
+        if (tokens.length < 3) {
+            return COLORS.BLACK; // Fallback color if not enough arguments
+        }
+        const [L, a, b, alpha] = tokens.map((t, i) => getTokenColorValue(t, i));
+        const [r, g, b_] = oklabToLinearSrgb(L / 100, a / 100, b / 100);
+        return pack(Math.round(linSrgb(r) * 255), Math.round(linSrgb(g) * 255), Math.round(linSrgb(b_) * 255), alpha);
+    },
+    oklch: (args: CSSValue[]): number => {
+        const tokens = args.filter(nonFunctionArgSeparator);
+        if (tokens.length < 3) {
+            return COLORS.BLACK; // Fallback color if not enough arguments
+        }
+        const [L, C, h, alpha] = tokens.map((t, i) => {
+            if (i === 2 && t.type === TokenType.DIMENSION_TOKEN) {
+                return angle.parse(t) * (180 / Math.PI); // Convert angle to degrees
+            }
+            return getTokenColorValue(t, i);
+        });
+        const [L_, a, b] = oklchToOklab(L / 100, C / 100, h);
+        const [r, g, b_] = oklabToLinearSrgb(L_, a, b);
+        return pack(Math.round(linSrgb(r) * 255), Math.round(linSrgb(g) * 255), Math.round(linSrgb(b_) * 255), alpha);
+    },
+    color: (args: CSSValue[]): number => {
+        const tokens = args.filter(nonFunctionArgSeparator);
+        if (tokens.length < 1) {
+            return COLORS.BLACK; // Fallback color if no arguments
+        }
+
+        const colorSpace = tokens[0];
+        if (colorSpace.type !== TokenType.IDENT_TOKEN) {
+            return COLORS.BLACK; // Fallback color if first argument is not an identifier
+        }
+
+        switch (colorSpace.value.toLowerCase()) {
+            case 'srgb':
+            case 'display-p3':
+            case 'a98-rgb':
+            case 'prophoto-rgb':
+            case 'rec2020':
+                // For now, treat all these color spaces as sRGB
+                // In the future, you might want to implement color space conversion
+                if (tokens.length < 4) {
+                    return COLORS.BLACK; // Fallback color if not enough arguments
+                }
+                const [, r, g, b, a] = tokens;
+                const alpha = typeof a !== 'undefined' && isLengthPercentage(a) ? getAbsoluteValue(a, 1) : 1;
+                return pack(getTokenColorValue(r, 0), getTokenColorValue(g, 1), getTokenColorValue(b, 2), alpha);
+            case 'oklab':
+                return SUPPORTED_COLOR_FUNCTIONS.oklab(tokens.slice(1));
+            case 'oklch':
+                return SUPPORTED_COLOR_FUNCTIONS.oklch(tokens.slice(1));
+            default:
+                console.warn(`Unsupported color space "${colorSpace.value}". Using fallback color.`);
+                return COLORS.BLACK; // Fallback color for unsupported color spaces
+        }
+    }
 };
 
 export const COLORS: {[key: string]: Color} = {
