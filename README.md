@@ -16,14 +16,27 @@ This is a branch of the original and fixes:
  The script allows you to take "screenshots" of webpages or parts of it, directly on the users browser. The screenshot is based on the DOM and as such may not be 100% accurate to the real representation as it does not make an actual screenshot, but builds the screenshot based on the information available on the page.
 
 
-### How does it work? ###
-The script renders the current page as a canvas image, by reading the DOM and the different styles applied to the elements.
+### Why another html2canvas package? ###
+This is a fork of niklasvh/html2canvas & nidi3/html2canvas that includes various fixes and new features. It offers several advantages over the original html2canvas, such as:
 
-It does **not require any rendering from the server**, as the whole image is created on the **client's browser**. However, as it is heavily dependent on the browser, this library is *not suitable* to be used in nodejs.
-It doesn't magically circumvent any browser content policy restrictions either, so rendering cross-origin content will require a [proxy](https://github.com/niklasvh/html2canvas/wiki/Proxies) to get the content to the [same origin](http://en.wikipedia.org/wiki/Same_origin_policy).
+- Gracefully handles cross-origin images
+- Gracefully handles color and advanced CSS properties
+- Supports SVG rendering
+- Support for object-fit and object-position CSS properties thanks to @yorickshan
 
-The script is still in a **very experimental state**, so I don't recommend using it in a production environment nor start building applications with it yet, as there will be still major changes made.
+### Installation ###
+```bash
+npm install @adenekan41/html2canvas
+```
 
+### Example ScreenShot ###
+- With @adenekan41/html2canvas
+  Handle textarea rendering, Cross-origin images, colors, SVG rendering, object-fit and object-position CSS properties
+- With niklasvh/html2canvas
+  
+- With html2canvas-pro
+  Handles colors but breaks screenshot, textarea rendering is off by a few pixels
+  
 ### Browser compatibility ###
 
 The library should work fine on the following browsers (with `Promise` polyfill):
