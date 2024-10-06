@@ -13,7 +13,8 @@ import {prefixRadialGradient} from './functions/-prefix-radial-gradient';
 export enum CSSImageType {
     URL,
     LINEAR_GRADIENT,
-    RADIAL_GRADIENT
+    RADIAL_GRADIENT,
+    UNSUPPORTED
 }
 
 export const isLinearGradient = (background: ICSSImage): background is CSSLinearGradientImage => {
@@ -68,6 +69,14 @@ export enum CSSRadialExtent {
     FARTHEST_CORNER
 }
 
+export interface UnsupportedImage extends ICSSImage {
+    type: CSSImageType.UNSUPPORTED;
+}
+
+const FALLBACK_IMAGE: UnsupportedImage = {
+    type: CSSImageType.UNSUPPORTED
+};
+
 export type CSSRadialSize = CSSRadialExtent | LengthPercentage[];
 
 export interface CSSRadialGradientImage extends ICSSGradientImage {
@@ -89,12 +98,14 @@ export const image: ITypeDescriptor<ICSSImage> = {
         if (value.type === TokenType.FUNCTION) {
             const imageFunction = SUPPORTED_IMAGE_FUNCTIONS[value.name];
             if (typeof imageFunction === 'undefined') {
-                throw new Error(`Attempting to parse an unsupported image function "${value.name}"`);
+                console.warn(`Unsupported image function "${value.name}". Using fallback.`);
+                return FALLBACK_IMAGE;
             }
             return imageFunction(value.values);
         }
 
-        throw new Error(`Unsupported image type`);
+        console.warn(`Unsupported image type. Using fallback.`);
+        return FALLBACK_IMAGE;
     }
 };
 
