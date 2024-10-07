@@ -8,8 +8,6 @@ html2canvas
 [![NPM Downloads](https://img.shields.io/npm/dm/html2canvas.svg)](https://www.npmjs.org/package/html2canvas)
 [![NPM Version](https://img.shields.io/npm/v/html2canvas.svg)](https://www.npmjs.org/package/html2canvas)
 
-This is a branch of the original and fixes:
-- Rendering of textarea (see [#2008](https://github.com/niklasvh/html2canvas/issues/2008))
 
 #### JavaScript HTML renderer ####
 
@@ -26,17 +24,17 @@ This is a fork of niklasvh/html2canvas & nidi3/html2canvas that includes various
 
 ### Installation ###
 ```bash
-npm install @adenekan41/html2canvas
+npm install @codewonders/html2canvas
 ```
 
 ### Example ScreenShot ###
-- With @adenekan41/html2canvas
+- With @codewonders/html2canvas
   Handle textarea rendering, Cross-origin images, colors, SVG rendering, object-fit and object-position CSS properties
 - With niklasvh/html2canvas
   
 - With html2canvas-pro
   Handles colors but breaks screenshot, textarea rendering is off by a few pixels
-  
+
 ### Browser compatibility ###
 
 The library should work fine on the following browsers (with `Promise` polyfill):

@@ -12,7 +12,7 @@ export const color: ITypeDescriptor<Color> = {
             const colorFunction = SUPPORTED_COLOR_FUNCTIONS[value.name];
             if (typeof colorFunction === 'undefined') {
                 console.warn(`>>> Unsupported color function "${value.name}". Using fallback color.`);
-                return COLORS.BLACK;
+                return COLORS.GRAY;
             }
             return colorFunction(value.values);
         }
@@ -180,7 +180,7 @@ const SUPPORTED_COLOR_FUNCTIONS: {
     oklab: (args: CSSValue[]): number => {
         const tokens = args.filter(nonFunctionArgSeparator);
         if (tokens.length < 3) {
-            return COLORS.BLACK; // Fallback color if not enough arguments
+            return COLORS.GRAY; // Fallback color if not enough arguments
         }
         const [L, a, b, alpha] = tokens.map((t, i) => getTokenColorValue(t, i));
         const [r, g, b_] = oklabToLinearSrgb(L / 100, a / 100, b / 100);
@@ -189,7 +189,7 @@ const SUPPORTED_COLOR_FUNCTIONS: {
     oklch: (args: CSSValue[]): number => {
         const tokens = args.filter(nonFunctionArgSeparator);
         if (tokens.length < 3) {
-            return COLORS.BLACK; // Fallback color if not enough arguments
+            return COLORS.GRAY; // Fallback color if not enough arguments
         }
         const [L, C, h, alpha] = tokens.map((t, i) => {
             if (i === 2 && t.type === TokenType.DIMENSION_TOKEN) {
@@ -204,12 +204,12 @@ const SUPPORTED_COLOR_FUNCTIONS: {
     color: (args: CSSValue[]): number => {
         const tokens = args.filter(nonFunctionArgSeparator);
         if (tokens.length < 1) {
-            return COLORS.BLACK; // Fallback color if no arguments
+            return COLORS.GRAY; // Fallback color if no arguments
         }
 
         const colorSpace = tokens[0];
         if (colorSpace.type !== TokenType.IDENT_TOKEN) {
-            return COLORS.BLACK; // Fallback color if first argument is not an identifier
+            return COLORS.GRAY; // Fallback color if first argument is not an identifier
         }
 
         switch (colorSpace.value.toLowerCase()) {
@@ -221,7 +221,7 @@ const SUPPORTED_COLOR_FUNCTIONS: {
                 // For now, treat all these color spaces as sRGB
                 // In the future, you might want to implement color space conversion
                 if (tokens.length < 4) {
-                    return COLORS.BLACK; // Fallback color if not enough arguments
+                    return COLORS.GRAY; // Fallback color if not enough arguments
                 }
                 const [, r, g, b, a] = tokens;
                 const alpha = typeof a !== 'undefined' && isLengthPercentage(a) ? getAbsoluteValue(a, 1) : 1;
@@ -232,7 +232,7 @@ const SUPPORTED_COLOR_FUNCTIONS: {
                 return SUPPORTED_COLOR_FUNCTIONS.oklch(tokens.slice(1));
             default:
                 console.warn(`Unsupported color space "${colorSpace.value}". Using fallback color.`);
-                return COLORS.BLACK; // Fallback color for unsupported color spaces
+                return COLORS.GRAY; // Fallback color for unsupported color spaces
         }
     }
 };
