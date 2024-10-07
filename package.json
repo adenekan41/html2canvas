@@ -10,7 +10,7 @@
   "module": "dist/html2canvas.esm.js",
   "typings": "dist/types/index.d.ts",
   "browser": "dist/html2canvas.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Niklas von Hertzen (original author)",
   "engines": {
     "node": ">=8.0.0"
