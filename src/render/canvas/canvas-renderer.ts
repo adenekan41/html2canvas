@@ -558,11 +558,14 @@ export class CanvasRenderer {
                         image.height,
                         image.width / image.height
                     ]);
-                    const pattern = this.ctx.createPattern(
-                        this.resizeImage(image, width, height),
-                        'repeat'
-                    ) as CanvasPattern;
-                    this.renderRepeat(path, pattern, x, y);
+
+                    if (width > 0 && height > 0) {
+                        const pattern = this.ctx.createPattern(
+                            this.resizeImage(image, width, height),
+                            'repeat'
+                        ) as CanvasPattern;
+                        this.renderRepeat(path, pattern, x, y);
+                    }
                 }
             } else if (isLinearGradient(backgroundImage)) {
                 const [path, x, y, width, height] = calculateBackgroundRendering(container, index, [null, null, null]);
@@ -575,7 +578,7 @@ export class CanvasRenderer {
                 const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
 
                 processColorStops(backgroundImage.stops, lineLength).forEach(colorStop =>
-                    gradient.addColorStop(colorStop.stop, asString(colorStop.color))
+                    gradient.addColorStop(Math.min(1, Math.max(0, colorStop.stop)), asString(colorStop.color))
                 );
 
                 ctx.fillStyle = gradient;
@@ -599,7 +602,7 @@ export class CanvasRenderer {
                     const radialGradient = this.ctx.createRadialGradient(left + x, top + y, 0, left + x, top + y, rx);
 
                     processColorStops(backgroundImage.stops, rx * 2).forEach(colorStop =>
-                        radialGradient.addColorStop(colorStop.stop, asString(colorStop.color))
+                        radialGradient.addColorStop(Math.min(1, Math.max(0, colorStop.stop)), asString(colorStop.color))
                     );
 
                     this.path(path);
